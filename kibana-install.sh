@@ -245,7 +245,8 @@ configure_kibana_yaml()
       echo "elasticsearch.hosts: [\"$ELASTICSEARCH_URL\"]" >> $KIBANA_CONF
     fi
     
-    echo "server.host: $(hostname -i)" >> $KIBANA_CONF
+    echo "server.host: '0'" >> $KIBANA_CONF
+	echo "xpack.encryptedSavedObjects.encryptionKey: 'fhjskloppd678ehkdfdlliverpoolfcr'" >> $KIBANA_CONF
     # specify kibana log location
     echo "logging.dest: /var/log/kibana.log" >> $KIBANA_CONF
     touch /var/log/kibana.log
@@ -292,9 +293,9 @@ configure_kibana_yaml()
       echo ${SSL_KEY} | base64 -d | tee $SSL_PATH/kibana.key
 
       log "[configure_kibana_yaml] Configuring SSL/TLS to Kibana"
-      echo "server.ssl.enabled: true" >> $KIBANA_CONF
-      echo "server.ssl.key: $SSL_PATH/kibana.key" >> $KIBANA_CONF
-      echo "server.ssl.certificate: $SSL_PATH/kibana.crt" >> $KIBANA_CONF
+      echo "#server.ssl.enabled: true" >> $KIBANA_CONF
+      echo "#server.ssl.key: $SSL_PATH/kibana.key" >> $KIBANA_CONF
+      echo "#server.ssl.certificate: $SSL_PATH/kibana.crt" >> $KIBANA_CONF
       if [[ -n "${SSL_PASSPHRASE}" ]]; then
           log "[configure_kibana_yaml] Adding server.ssl.keyPassphrase to kibana.keystore"
           create_keystore_if_not_exists
