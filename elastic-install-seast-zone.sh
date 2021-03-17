@@ -869,9 +869,11 @@ configure_awareness_attributes()
   log "[configure_awareness_attributes] configure zone and update domain attributes"
   local METADATA=$(curl -sH Metadata:true "http://169.254.169.254/metadata/instance?api-version=2018-10-01")
   local Zone=$(jq -r .compute.zone <<< $METADATA)
+  local FAULT_DOMAIN=$(jq -r .compute.platformFaultDomain <<< $METADATA)
   echo "node.attr.zone: $Zone" >> $ES_CONF
-  log "[configure_awareness_attributes] configure shard allocation awareness using zone"
-  echo "cluster.routing.allocation.awareness.attributes: zone" >> $ES_CONF
+  echo "node.attr.fault_domain: $FAULT_DOMAIN" >> $ES_CONF
+  log "[configure_awareness_attributes] configure shard allocation awareness using zone and fault_domain"
+  echo "cluster.routing.allocation.awareness.attributes: zone,fault_domain" >> $ES_CONF
 }
 
 configure_elasticsearch_yaml()
