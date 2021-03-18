@@ -869,9 +869,11 @@ configure_awareness_attributes()
   log "[configure_awareness_attributes] configure zone and update domain attributes"
   local METADATA=$(curl -sH Metadata:true "http://169.254.169.254/metadata/instance?api-version=2018-10-01")
   local Zone=$(jq -r .compute.zone <<< $METADATA)
+  local FAULT_DOMAIN=$(jq -r .compute.platformFaultDomain <<< $METADATA)
   echo "node.attr.zone: $Zone" >> $ES_CONF
-  log "[configure_awareness_attributes] configure shard allocation awareness using zone"
-  echo "cluster.routing.allocation.awareness.attributes: zone" >> $ES_CONF
+  echo "node.attr.fault_domain: $FAULT_DOMAIN" >> $ES_CONF
+  log "[configure_awareness_attributes] configure shard allocation awareness using zone and fault_domain"
+  echo "cluster.routing.allocation.awareness.attributes: zone,fault_domain" >> $ES_CONF
 }
 
 configure_elasticsearch_yaml()
@@ -1055,8 +1057,8 @@ configure_elasticsearch_yaml()
             echo -e "xpack.security.authc.realms.saml.saml_aad:"
           fi
           echo -e "  order: 2"
-          echo -e "  idp.metadata.path: /etc/elasticsearch/saml/metadata.xml"
-          echo -e "  idp.entity_id: \"$IDP_ENTITY_ID\""
+          echo -e "  idp.metadata.path: \"https://login.microsoftonline.com/afadec18-0533-4cba-8578-5316252ff93f/federationmetadata/2007-06/federationmetadata.xml?appid=91be6b22-9045-4147-8617-b3f6b02eff0e\""
+          echo -e "  idp.entity_id: \"https://sts.windows.net/afadec18-0533-4cba-8578-5316252ff93f/\""
           echo -e "  sp.entity_id:  \"$SAML_SP_URI/\""
           echo -e "  sp.acs: \"$SAML_SP_URI/api/security/v1/saml\""
           echo -e "  sp.logout: \"$SAML_SP_URI/logout\""
