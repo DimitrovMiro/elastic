@@ -146,8 +146,8 @@ TRANSPORT_CACERT=""
 TRANSPORT_CACERT_PASSWORD=""
 TRANSPORT_CERT_PASSWORD=""
 
-SAML_METADATA_URI="https://login.microsoftonline.com/afadec18-0533-4cba-8578-5316252ff93f/federationmetadata/2007-06/federationmetadata.xml?appid=91be6b22-9045-4147-8617-b3f6b02eff0e"
-SAML_SP_URI="https://logging.ifscsc.cloud:443"
+SAML_METADATA_URI=""
+SAML_SP_URI=""
 
 #Loop through options passed
 while getopts :n:m:v:A:R:M:K:S:F:Z:p:a:k:L:C:B:E:H:G:T:W:V:J:N:D:O:P:xyzldjh optname; do
@@ -1047,7 +1047,7 @@ configure_elasticsearch_yaml()
       SAML_SP_URI="${SAML_SP_URI%/}"
       # extract the entityID from the metadata file
       local IDP_ENTITY_ID="$(grep -oP '\sentityID="(.*?)"\s' /etc/elasticsearch/saml/metadata.xml | sed 's/^.*"\(.*\)".*/\1/')"
-    {
+      {
           echo -e ""
           # include the realm type in the setting name in 7.x +
           if dpkg --compare-versions "$ES_VERSION" "lt" "7.0.0"; then
@@ -1057,9 +1057,9 @@ configure_elasticsearch_yaml()
             echo -e "xpack.security.authc.realms.saml.saml_aad:"
           fi
           echo -e "  order: 2"
-          echo -e "  idp.metadata.path: /etc/elasticsearch/saml/metadata.xml"
+          echo -e "  idp.metadata.path: \"https://login.microsoftonline.com/afadec18-0533-4cba-8578-5316252ff93f/federationmetadata/2007-06/federationmetadata.xml?appid=91be6b22-9045-4147-8617-b3f6b02eff0e\""
           echo -e "  idp.entity_id: \"https://sts.windows.net/afadec18-0533-4cba-8578-5316252ff93f/\""
-          echo -e "  sp.entity_id:  \"$SAML_SP_URI/\""
+          echo -e "  sp.entity_id:  \"$SAML_SP_URI\""
           echo -e "  sp.acs: \"$SAML_SP_URI/api/security/v1/saml\""
           echo -e "  sp.logout: \"$SAML_SP_URI/logout\""
           echo -e "  attributes.principal: \"http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name\""
